@@ -1,0 +1,18 @@
+lab:
+  name: covenant-lab
+  purpose: authorized-security-testing
+  public_access: false
+
+local:
+  bind_address: 127.0.0.1
+  management_port: 7443
+
+cloud:
+  private_only: true
+  management_access: vpn-or-bastion
+  destroy_after_hours: 8
+
+providers:
+  aws: true
+  azure: true
+  gcp: true

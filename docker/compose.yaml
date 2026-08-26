@@ -1,0 +1,11 @@
+services:
+  covenant:
+    build:
+      context: ../vendor/Covenant/Covenant
+      dockerfile: Dockerfile
+    container_name: covenant-lab
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:7443:7443"
+    volumes:
+      - ../data:/app/Data

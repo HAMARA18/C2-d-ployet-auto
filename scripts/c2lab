@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+COMPOSE=(docker compose -f "$ROOT/docker/compose.yaml")
+
+usage() {
+  cat <<USAGE
+Usage: ./scripts/c2lab <command>
+
+Local lab commands:
+  bootstrap   Clone/update Covenant source and validate prerequisites
+  doctor      Check local prerequisites and lab state
+  up          Build and start the local lab
+  down        Stop the local lab
+  status      Show container status and local URL
+  logs        Follow Covenant logs
+  reset       Stop the lab and delete local lab data
+  test        Run local static/syntax checks
+
+Cloud validation:
+  cloud-validate  Validate Terraform configuration without creating resources
+USAGE
+}
+
+cmd="${1:-}"
+case "$cmd" in
+  bootstrap) exec "$ROOT/scripts/bootstrap.sh" ;;
+  doctor) exec "$ROOT/scripts/doctor.sh" ;;
+  up)
+    "$ROOT/scripts/doctor.sh"
+    "${COMPOSE[@]}" up -d --build
+    echo
+    echo "[OK] Local lab started: https://127.0.0.1:7443"
+    ;;
+  down) "${COMPOSE[@]}" down --remove-orphans ;;
+  status)
+    "${COMPOSE[@]}" ps
+    echo "URL: https://127.0.0.1:7443"
+    ;;
+  logs) "${COMPOSE[@]}" logs -f --tail=200 ;;
+  reset)
+    "$ROOT/scripts/reset-lab.sh" --yes
+    ;;
+  test) exec "$ROOT/scripts/test.sh" ;;
+  cloud-validate) exec "$ROOT/scripts/cloud-validate.sh" ;;
+  -h|--help|help) usage ;;
+  *) echo "Commande inconnue: ${cmd:-<vide>}"; usage; exit 2 ;;
+esac
