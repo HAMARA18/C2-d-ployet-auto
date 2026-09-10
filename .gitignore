@@ -5,3 +5,7 @@
 *.tfstate.*
 crash.log
 *.tfvars
+.DS_Store
+Makefile
+y
+y.pub
